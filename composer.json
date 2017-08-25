@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Vmorozov\\FileUploads\\": "src/"
+            "Vmorozov\\FileUploads\\": "src/FileUploads"
         }
     },
     "autoload-dev": {

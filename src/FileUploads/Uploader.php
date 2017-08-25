@@ -41,7 +41,7 @@ class Uploader
     {
         $file = FilesSaver::createUploadedFileFromBase64($value, $uploadsFolder);
 
-        return $file->path();
+        return $uploadsFolder . '/' . $file->getBasename();
     }
 
     public static function saveFileLocally(UploadedFile $file, string $uploadFolder = ''): string

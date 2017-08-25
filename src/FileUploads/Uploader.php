@@ -3,6 +3,7 @@
 namespace Vmorozov\FileUploads;
 
 use Illuminate\Http\UploadedFile;
+use Vmorozov\FileUploads\Jobs\SaveAndResizeImage;
 
 class Uploader
 {
@@ -31,7 +32,7 @@ class Uploader
         return $path;
     }
 
-    public function deleteFile(string $path)
+    public static function deleteFile(string $path)
     {
         FilesSaver::deleteFile($path);
     }

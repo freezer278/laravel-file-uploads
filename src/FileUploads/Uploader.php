@@ -32,6 +32,23 @@ class Uploader
         return $path;
     }
 
+    public static function uploadBase64Image(string $value, string $uploadFolder = '', int $width = 0, int $height = 0): string
+    {
+        $localPath = static::saveBase64ImageLocally($value, $uploadFolder);
+        $file = FilesSaver::createUploadedFileFromPath($localPath);
+
+        if (env('FILES_UPLOAD') === FilesSaver::STORAGE_AMAZON_S3) {
+            $path = FilesSaver::uploadFile($file, $uploadFolder, false, true, $localPath);
+
+            dispatch(new SaveAndResizeImage($localPath, $width, $height));
+        }
+        else {
+            $path = $localPath;
+        }
+
+        return $path;
+    }
+
     public static function deleteFile(string $path)
     {
         FilesSaver::deleteFile($path);

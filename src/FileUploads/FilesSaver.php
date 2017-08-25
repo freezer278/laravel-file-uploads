@@ -5,6 +5,8 @@ namespace Vmorozov\FileUploads;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Intervention\Image\File;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 class FilesSaver
 {
@@ -160,14 +162,25 @@ class FilesSaver
     {
         $file = (new File())->setFileInfoFromPath($path);
 
-        return new UploadedFile(
-            $path,
-            $file->basename,
-            $file->mime,
-            $file->filesize(),
-            UPLOAD_ERR_OK,
-            true
-        );
+        try {
+            return new UploadedFile(
+                $path,
+                $file->basename,
+                $file->mime,
+                $file->filesize(),
+                UPLOAD_ERR_OK,
+                true
+            );
+        } catch (FileNotFoundException $exception) {
+            return new UploadedFile(
+                public_path($path),
+                $file->basename,
+                $file->mime,
+                $file->filesize(),
+                UPLOAD_ERR_OK,
+                true
+            );
+        }
     }
 
     public static function createUploadedFileFromBase64(string $value, string $uploadFolder = ''): UploadedFile

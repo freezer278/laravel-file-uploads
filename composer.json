@@ -1,8 +1,8 @@
 {
-    "name": "vmorozv/cloud-file-uploads-laravel",
+    "name": "vmorozv/laravel-file-uploads",
     "type": "library",
-    "description": "This package provides a convenient way to upload files to the cloud storage amazon s3 fast to Laravel",
-    "keywords": ["laravel","illuminate","file uploads","cloud uploads","s3","aws", "amazon s3"],
+    "description": "This package provides a convenient way to upload files to the cloud storage amazon s3 or locally fast in Laravel",
+    "keywords": ["laravel","illuminate","file uploads","cloud uploads","s3", "aws","amazon s3","filesystems"],
     "license": "MIT",
     "authors": [
         {

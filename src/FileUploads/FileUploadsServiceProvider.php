@@ -1,12 +1,10 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: vladimir
- * Date: 26.08.17
- * Time: 09:51
- */
-class FileUploadsServiceProvider extends Illuminate\Support\ServiceProvider
+namespace Vmorozov\FileUploads;
+
+use Illuminate\Support\ServiceProvider;
+
+class FileUploadsServiceProvider extends ServiceProvider
 {
     public function boot()
     {

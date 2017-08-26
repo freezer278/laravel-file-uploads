@@ -99,7 +99,7 @@ class FilesSaver
 
     private static function checkStorageAndSaveFile($file, string $path, bool $local = true, bool $dryRun = false, bool $public = true): string
     {
-        if (!$local && env('FILES_UPLOAD') === self::STORAGE_AMAZON_S3) {
+        if (!$local && config('file_uploads.files_upload_storage') === self::STORAGE_AMAZON_S3) {
             if (!$dryRun) {
                 if ($public)
                     Storage::disk(self::STORAGE_AMAZON_S3)->putFileAs('/', $file, $path, 'public');
@@ -150,7 +150,7 @@ class FilesSaver
 
     public static function deleteFile(string $path, $local = false)
     {
-        if (!$local && env('FILES_UPLOAD') === self::STORAGE_AMAZON_S3) {
+        if (!$local && config('file_uploads.files_upload_storage') === self::STORAGE_AMAZON_S3) {
             return Storage::disk(self::STORAGE_AMAZON_S3)->delete(self::getPathFromAmazonS3Url($path));
         }
         else {

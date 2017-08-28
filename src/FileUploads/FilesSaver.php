@@ -194,6 +194,10 @@ class FilesSaver
 
         $path = $uploadFolder.'/'.$filename;
 
+        if (!file_exists(public_path($uploadFolder))) {
+            mkdir(public_path($uploadFolder));
+        }
+
         $image->save(public_path($path), self::DEFAULT_IMAGE_QUALITY);
 
         return new UploadedFile(

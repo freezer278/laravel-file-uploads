@@ -35,7 +35,7 @@ class FilesSaver
         $fileNameGiven = ($fileName !== '');
 
         if ($uploadFolder == '')
-            $uploadFolder = self::DEFAULT_UPLOADS_FOLDER;
+            $uploadFolder = config('file_uploads.default_uploads_folder');
 
         if (self::checkFileIsValid($file, $local)) {
 
@@ -186,7 +186,7 @@ class FilesSaver
     public static function createUploadedFileFromBase64(string $value, string $uploadFolder = ''): UploadedFile
     {
         if ($uploadFolder == '')
-            $uploadFolder = self::DEFAULT_UPLOADS_FOLDER;
+            $uploadFolder = config('file_uploads.default_uploads_folder');
 
         $image = Image::make($value);
 

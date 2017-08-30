@@ -9,7 +9,7 @@ class FileUploadsServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../config/config.php' => app()->basePath() . '/config/file_uploads.php',
+            __DIR__.'/../config/file_uploads.php' => app()->basePath() . '/config/file_uploads.php',
         ]);
     }
 }

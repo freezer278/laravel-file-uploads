@@ -14,4 +14,13 @@ return [
     */
     'files_upload_storage' => env('FILES_UPLOAD', \Vmorozov\FileUploads\FilesSaver::STORAGE_LOCAL),
 
+    /*
+    |--------------------------------------------------------------------------
+    | This is the default level of quality for the stored images
+    |--------------------------------------------------------------------------
+    | Possible values are from 1 to 100
+    |
+    */
+    'image_quality' => env('IMAGES_QUALITY', \Vmorozov\FileUploads\FilesSaver::DEFAULT_IMAGE_QUALITY),
+
 ];

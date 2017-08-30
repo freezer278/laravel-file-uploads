@@ -15,7 +15,7 @@ class FilesSaver
     const STORAGE_LOCAL = 'local';
     const STORAGE_AMAZON_S3 = 's3';
 
-    const DEFAULT_IMAGE_QUALITY = 50;
+    const DEFAULT_IMAGE_QUALITY = 100;
     const DEFAULT_IMAGE_EXTENSION = 'jpg';
 
     /**
@@ -198,7 +198,7 @@ class FilesSaver
             mkdir(public_path($uploadFolder));
         }
 
-        $image->save(public_path($path), self::DEFAULT_IMAGE_QUALITY);
+        $image->save(public_path($path), config('file_uploads.image_quality'));
 
         return new UploadedFile(
             $image->basePath(),

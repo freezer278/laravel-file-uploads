@@ -12,31 +12,26 @@ class Uploader
      *
      * @param UploadedFile $file
      * @param string $uploadFolder
-     * @param int $width
-     * @param int $height
      * @param string $storage
+     * @param array $options
      * @return string
      */
-    public static function uploadFile(UploadedFile $file, $uploadFolder = '', int $width = 0, int $height = 0, string $storage = ''): string
+    public static function uploadFile(UploadedFile $file, $uploadFolder = '', string $storage = '', array $options = []): string
     {
         if ($storage === '')
             $storage = config('file_uploads.files_upload_storage');
 
         $localPath = FilesSaver::uploadFile($file, $uploadFolder);
 
-        if (env('FILES_UPLOAD') === FilesSaver::STORAGE_AMAZON_S3) {
-            $path = FilesSaver::uploadFile($file, $uploadFolder, $storage, true, $localPath);
-
-            dispatch(new SaveAndResizeImage($localPath, $width, $height));
-        }
-        else {
+        if ($storage !== FilesSaver::STORAGE_LOCAL)
+            $path = static::saveFileToRemoteStorage($file, $localPath, $storage, $options);
+        else
             $path = $localPath;
-        }
 
         return $path;
     }
 
-    public static function uploadBase64Image(string $value, string $uploadFolder = '', int $width = 0, int $height = 0, string $storage = ''): string
+    public static function uploadBase64Image(string $value, string $uploadFolder = '', string $storage = '', array $options = []): string
     {
         if ($storage === '')
             $storage = config('file_uploads.files_upload_storage');
@@ -44,14 +39,10 @@ class Uploader
         $localPath = static::saveBase64ImageLocally($value, $uploadFolder);
         $file = UploadedFilesCreator::createUploadedFileFromPath($localPath);
 
-        if ($storage !== FilesSaver::STORAGE_LOCAL) {
-            $path = FilesSaver::uploadFile($file, $uploadFolder, $storage, true, $localPath);
-
-            dispatch(new SaveAndResizeImage($localPath, $width, $height));
-        }
-        else {
+        if ($storage !== FilesSaver::STORAGE_LOCAL)
+            $path = static::saveFileToRemoteStorage($file, $localPath, $storage, $options);
+        else
             $path = $localPath;
-        }
 
         return $path;
     }
@@ -62,6 +53,16 @@ class Uploader
             $storage = config('file_uploads.files_upload_storage');
 
         FilesSaver::deleteFile($path, $storage);
+    }
+
+    public static function saveFileToRemoteStorage(UploadedFile $file, string $localPath, string $storage = '', array $options = []): string
+    {
+        $width = (isset($options['width']) ? $options['width'] : 0);
+        $height = (isset($options['height']) ? $options['height'] : 0);
+
+        dispatch(new SaveAndResizeImage($localPath, $width, $height));
+
+        return FilesSaver::uploadFile($file, '', $storage, true, $localPath);
     }
 
     public static function saveBase64ImageLocally(string $value, string $uploadsFolder = ''): string

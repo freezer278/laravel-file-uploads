@@ -60,7 +60,7 @@ class Uploader
         $width = (isset($options['width']) ? $options['width'] : 0);
         $height = (isset($options['height']) ? $options['height'] : 0);
 
-        dispatch(new SaveAndResizeImage($localPath, $width, $height));
+        dispatch(new SaveAndResizeImage($localPath, $storage, $width, $height));
 
         return FilesSaver::uploadFile($file, '', $storage, true, $localPath);
     }

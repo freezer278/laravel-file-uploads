@@ -16,7 +16,7 @@ class Uploader
      * @param int $height
      * @return string
      */
-    public static function uploadFile(UploadedFile $file, $uploadFolder = '', int $width = 0, int $height = 0)
+    public static function uploadFile(UploadedFile $file, $uploadFolder = '', int $width = 0, int $height = 0, string $storage = FilesSaver::STORAGE_LOCAL)
     {
         $localPath = FilesSaver::uploadFile($file, $uploadFolder, true);
 
@@ -32,7 +32,7 @@ class Uploader
         return $path;
     }
 
-    public static function uploadBase64Image(string $value, string $uploadFolder = '', int $width = 0, int $height = 0): string
+    public static function uploadBase64Image(string $value, string $uploadFolder = '', int $width = 0, int $height = 0, string $storage = FilesSaver::STORAGE_LOCAL): string
     {
         $localPath = static::saveBase64ImageLocally($value, $uploadFolder);
         $file = FilesSaver::createUploadedFileFromPath($localPath);
@@ -49,7 +49,7 @@ class Uploader
         return $path;
     }
 
-    public static function deleteFile(string $path)
+    public static function deleteFile(string $path, string $storage = FilesSaver::STORAGE_LOCAL)
     {
         FilesSaver::deleteFile($path);
     }

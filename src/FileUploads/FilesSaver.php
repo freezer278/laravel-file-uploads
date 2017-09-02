@@ -4,9 +4,6 @@ namespace Vmorozov\FileUploads;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
-use Intervention\Image\File;
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 class FilesSaver
 {
@@ -23,12 +20,12 @@ class FilesSaver
      *
      * @param UploadedFile $file
      * @param string $uploadFolder
-     * @param bool $local
-     * @param string $fileName
+     * @param string $storage
      * @param bool $dryRun
+     * @param string $fileName
      * @return string
      */
-    public static function uploadFile(UploadedFile $file, string $uploadFolder = '', bool $local = true, bool $dryRun = false, string $fileName = ''): string
+    public static function uploadFile(UploadedFile $file, string $uploadFolder = '', string $storage = FilesSaver::STORAGE_LOCAL, bool $dryRun = false, string $fileName = ''): string
     {
         $path = '';
 
@@ -37,7 +34,7 @@ class FilesSaver
         if ($uploadFolder == '')
             $uploadFolder = config('file_uploads.default_uploads_folder');
 
-        if (self::checkFileIsValid($file, $local)) {
+        if (self::checkFileIsValid($file, $storage)) {
 
             if (!$fileNameGiven) {
                 $path = $uploadFolder . '/' . md5($file->getFilename().microtime()) . '.'.$file->extension();;
@@ -45,7 +42,7 @@ class FilesSaver
             else
                 $path = $fileName;
 
-            $path = self::checkStorageAndSaveFile($file, $path, $local, $dryRun);
+            $path = self::checkStorageAndSaveFile($file, $path, $storage, $dryRun);
         }
 
         // todo: if file is not valid throw some exception
@@ -58,9 +55,9 @@ class FilesSaver
         return array_last(explode('/', $path));
     }
 
-    public static function checkFileIsValid(UploadedFile $file, bool $local): bool
+    public static function checkFileIsValid(UploadedFile $file, string $storage): bool
     {
-        $fileIsValid = $local ? $file->isValid() : true;
+        $fileIsValid = $storage === FilesSaver::STORAGE_LOCAL ? $file->isValid() : true;
 
         return ($file != null && $fileIsValid);
     }
@@ -80,24 +77,26 @@ class FilesSaver
         return (substr($mime, 0, 5) == 'image');
     }
 
-    private static function checkStorageAndSaveFile($file, string $path, bool $local = true, bool $dryRun = false, bool $public = true): string
+    private static function checkStorageAndSaveFile(
+        $file,
+        string $path,
+        string $storage = FilesSaver::STORAGE_LOCAL,
+        bool $dryRun = false,
+        bool $public = true
+    ): string
     {
-        if (!$local && config('file_uploads.files_upload_storage') === self::STORAGE_AMAZON_S3) {
-            if (!$dryRun) {
-                if ($public)
-                    Storage::disk(self::STORAGE_AMAZON_S3)->putFileAs('/', $file, $path, 'public');
-                else
-                    Storage::disk(self::STORAGE_AMAZON_S3)->putFileAs('/', $file, $path);
+        if (!$dryRun) {
+            if ($storage !== FilesSaver::STORAGE_LOCAL) {
+                Storage::disk($storage)->putFileAs('/', $file, $path, ($public ? 'public' : []));
+
+                $path = Storage::disk($storage)->url($path);
             }
-
-            return Storage::disk(self::STORAGE_AMAZON_S3)->url($path);
+            else {
+                static::saveFileLocally($file, $path);
+            }
         }
-        else {
-            if (!$dryRun)
-                self::saveFileLocally($file, $path);
 
-            return $path;
-        }
+        return $path;
     }
 
     private static function saveFileLocally($file, string $path)
@@ -131,13 +130,16 @@ class FilesSaver
 
     }
 
-    public static function deleteFile(string $path, $local = false)
+    public static function deleteFile(string $path, string $storage = FilesSaver::STORAGE_LOCAL)
     {
-        if (!$local && config('file_uploads.files_upload_storage') === self::STORAGE_AMAZON_S3) {
-            return Storage::disk(self::STORAGE_AMAZON_S3)->delete(self::getPathFromAmazonS3Url($path));
-        }
-        else {
-            return @unlink(public_path($path));
+        switch ($storage) {
+            case FilesSaver::STORAGE_AMAZON_S3:
+                return Storage::disk($storage)->delete(self::getPathFromAmazonS3Url($path));
+                break;
+
+            default:
+                return @unlink(public_path($path));
+                break;
         }
     }
 }

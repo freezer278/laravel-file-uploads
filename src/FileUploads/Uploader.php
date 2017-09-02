@@ -14,14 +14,18 @@ class Uploader
      * @param string $uploadFolder
      * @param int $width
      * @param int $height
+     * @param string $storage
      * @return string
      */
-    public static function uploadFile(UploadedFile $file, $uploadFolder = '', int $width = 0, int $height = 0, string $storage = FilesSaver::STORAGE_LOCAL): string
+    public static function uploadFile(UploadedFile $file, $uploadFolder = '', int $width = 0, int $height = 0, string $storage = ''): string
     {
-        $localPath = FilesSaver::uploadFile($file, $uploadFolder, true);
+        if ($storage === '')
+            $storage = config('file_uploads.files_upload_storage');
+
+        $localPath = FilesSaver::uploadFile($file, $uploadFolder);
 
         if (env('FILES_UPLOAD') === FilesSaver::STORAGE_AMAZON_S3) {
-            $path = FilesSaver::uploadFile($file, $uploadFolder, false, true, $localPath);
+            $path = FilesSaver::uploadFile($file, $uploadFolder, $storage, true, $localPath);
 
             dispatch(new SaveAndResizeImage($localPath, $width, $height));
         }
@@ -32,13 +36,16 @@ class Uploader
         return $path;
     }
 
-    public static function uploadBase64Image(string $value, string $uploadFolder = '', int $width = 0, int $height = 0, string $storage = FilesSaver::STORAGE_LOCAL): string
+    public static function uploadBase64Image(string $value, string $uploadFolder = '', int $width = 0, int $height = 0, string $storage = ''): string
     {
+        if ($storage === '')
+            $storage = config('file_uploads.files_upload_storage');
+
         $localPath = static::saveBase64ImageLocally($value, $uploadFolder);
         $file = UploadedFilesCreator::createUploadedFileFromPath($localPath);
 
-        if (env('FILES_UPLOAD') === FilesSaver::STORAGE_AMAZON_S3) {
-            $path = FilesSaver::uploadFile($file, $uploadFolder, false, true, $localPath);
+        if ($storage !== FilesSaver::STORAGE_LOCAL) {
+            $path = FilesSaver::uploadFile($file, $uploadFolder, $storage, true, $localPath);
 
             dispatch(new SaveAndResizeImage($localPath, $width, $height));
         }
@@ -49,9 +56,12 @@ class Uploader
         return $path;
     }
 
-    public static function deleteFile(string $path, string $storage = FilesSaver::STORAGE_LOCAL)
+    public static function deleteFile(string $path, string $storage = '')
     {
-        FilesSaver::deleteFile($path);
+        if ($storage === '')
+            $storage = config('file_uploads.files_upload_storage');
+
+        FilesSaver::deleteFile($path, $storage);
     }
 
     public static function saveBase64ImageLocally(string $value, string $uploadsFolder = ''): string
@@ -63,7 +73,7 @@ class Uploader
 
     public static function saveFileLocally(UploadedFile $file, string $uploadFolder = ''): string
     {
-        $localPath = FilesSaver::uploadFile($file, $uploadFolder, true);
+        $localPath = FilesSaver::uploadFile($file, $uploadFolder);
 
         return $localPath;
     }

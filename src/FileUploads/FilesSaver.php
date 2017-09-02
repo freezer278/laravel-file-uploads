@@ -39,30 +39,13 @@ class FilesSaver
 
         if (self::checkFileIsValid($file, $local)) {
 
-            if (!$fileNameGiven)
-                $path = $uploadFolder . '/' . md5($file->getFilename().microtime());
+            if (!$fileNameGiven) {
+                $path = $uploadFolder . '/' . md5($file->getFilename().microtime()) . '.'.$file->extension();;
+            }
             else
                 $path = $fileName;
 
-//            if (self::checkFileIsImage($file)) {
-//                if (!$fileNameGiven)
-//                    $path .= '.'.self::DEFAULT_IMAGE_EXTENSION;
-//
-//                if (!$dryRun) {
-//                    $image = Image::make($file->getRealPath())->encode(self::DEFAULT_IMAGE_EXTENSION, self::DEFAULT_IMAGE_QUALITY);
-//                    $image = $image->stream()->__toString();
-//                }
-//                else
-//                    $image = $file;
-//
-//                $path = self::checkStorageAndSaveFile($image, $path, $local, $dryRun);
-//            }
-//            else {
-            if (!$fileNameGiven)
-                $path .= '.'.$file->extension();
-
             $path = self::checkStorageAndSaveFile($file, $path, $local, $dryRun);
-//            }
         }
 
         // todo: if file is not valid throw some exception
@@ -124,7 +107,7 @@ class FilesSaver
         $uploadFolder = public_path(implode('/', $explodedPath));
 
 //        if (!$file instanceof UploadedFile)
-//         Todo: do something
+//         Todo: throw some exception
 
         $file->move($uploadFolder, $filename);
     }
@@ -156,57 +139,5 @@ class FilesSaver
         else {
             return @unlink(public_path($path));
         }
-    }
-
-    public static function createUploadedFileFromPath(string $path): UploadedFile
-    {
-        $file = (new File())->setFileInfoFromPath($path);
-
-        try {
-            return new UploadedFile(
-                $path,
-                $file->basename,
-                $file->mime,
-                $file->filesize(),
-                UPLOAD_ERR_OK,
-                true
-            );
-        } catch (FileNotFoundException $exception) {
-            return new UploadedFile(
-                public_path($path),
-                $file->basename,
-                $file->mime,
-                $file->filesize(),
-                UPLOAD_ERR_OK,
-                true
-            );
-        }
-    }
-
-    public static function createUploadedFileFromBase64(string $value, string $uploadFolder = ''): UploadedFile
-    {
-        if ($uploadFolder == '')
-            $uploadFolder = config('file_uploads.default_uploads_folder');
-
-        $image = Image::make($value);
-
-        $filename = md5($image->basename.microtime()).'.jpg';
-
-        $path = $uploadFolder.'/'.$filename;
-
-        if (!file_exists(public_path($uploadFolder))) {
-            mkdir(public_path($uploadFolder));
-        }
-
-        $image->save(public_path($path), config('file_uploads.image_quality'));
-
-        return new UploadedFile(
-            $image->basePath(),
-            $image->basename,
-            $image->mime,
-            $image->filesize(),
-            UPLOAD_ERR_OK,
-            true
-        );
     }
 }

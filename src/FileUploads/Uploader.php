@@ -16,7 +16,7 @@ class Uploader
      * @param int $height
      * @return string
      */
-    public static function uploadFile(UploadedFile $file, $uploadFolder = '', int $width = 0, int $height = 0, string $storage = FilesSaver::STORAGE_LOCAL)
+    public static function uploadFile(UploadedFile $file, $uploadFolder = '', int $width = 0, int $height = 0, string $storage = FilesSaver::STORAGE_LOCAL): string
     {
         $localPath = FilesSaver::uploadFile($file, $uploadFolder, true);
 
@@ -35,7 +35,7 @@ class Uploader
     public static function uploadBase64Image(string $value, string $uploadFolder = '', int $width = 0, int $height = 0, string $storage = FilesSaver::STORAGE_LOCAL): string
     {
         $localPath = static::saveBase64ImageLocally($value, $uploadFolder);
-        $file = FilesSaver::createUploadedFileFromPath($localPath);
+        $file = UploadedFilesCreator::createUploadedFileFromPath($localPath);
 
         if (env('FILES_UPLOAD') === FilesSaver::STORAGE_AMAZON_S3) {
             $path = FilesSaver::uploadFile($file, $uploadFolder, false, true, $localPath);
@@ -56,7 +56,7 @@ class Uploader
 
     public static function saveBase64ImageLocally(string $value, string $uploadsFolder = ''): string
     {
-        $file = FilesSaver::createUploadedFileFromBase64($value, $uploadsFolder);
+        $file = UploadedFilesCreator::createUploadedFileFromBase64($value, $uploadsFolder);
 
         return $uploadsFolder . '/' . $file->getBasename();
     }

@@ -56,8 +56,7 @@ class SaveAndResizeImage implements ShouldQueue
         $file = UploadedFilesCreator::createUploadedFileFromPath($this->path);
 
         FilesSaver::uploadFile($file, '', $this->storage, false, $this->path);
-
-        FilesSaver::deleteFile(public_path($this->path), FilesSaver::STORAGE_LOCAL);
+        FilesSaver::deleteFile($this->path, FilesSaver::STORAGE_LOCAL);
     }
 
     private function transformLocalImage(string $path): Image

@@ -67,9 +67,9 @@ class SaveAndResizeImage implements ShouldQueue
             $file->fit($this->width, $this->height);
         }
 
-        $file->encode(FilesSaver::DEFAULT_IMAGE_EXTENSION, FilesSaver::DEFAULT_IMAGE_QUALITY);
+        $file->encode(config('file_uploads.image_extension'), config('file_uploads.image_quality'));
 
-        $file->save(public_path($path), FilesSaver::DEFAULT_IMAGE_QUALITY);
+        $file->save(public_path($path), config('file_uploads.image_quality'));
 
         return $file;
     }

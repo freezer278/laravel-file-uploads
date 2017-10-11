@@ -24,7 +24,7 @@ class UploadedFilesCreator
 
         $image = Image::make($value);
 
-        $filename = md5($image->basename.microtime()).'.jpg';
+        $filename = md5($image->basename.microtime()).'.'.config('file_uploads.image_extension');
 
         $path = $uploadFolder.'/'.$filename;
 

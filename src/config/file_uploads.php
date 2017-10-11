@@ -23,6 +23,16 @@ return [
     */
     'image_quality' => env('IMAGE_QUALITY', \Vmorozov\FileUploads\FilesSaver::DEFAULT_IMAGE_QUALITY),
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | This is the default level of quality for the stored images
+    |--------------------------------------------------------------------------
+    | Possible values are from 1 to 100
+    |
+    */
+    'image_extension' => env('IMAGE_EXTENSION', \Vmorozov\FileUploads\FilesSaver::DEFAULT_IMAGE_EXTENSION),
+
     /*
     |--------------------------------------------------------------------------
     | This is the default level of quality for the stored images

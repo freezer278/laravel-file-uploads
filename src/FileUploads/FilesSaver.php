@@ -13,7 +13,7 @@ class FilesSaver
     const STORAGE_AMAZON_S3 = 's3';
 
     const DEFAULT_IMAGE_QUALITY = 100;
-    const DEFAULT_IMAGE_EXTENSION = 'jpg';
+    const DEFAULT_IMAGE_EXTENSION = 'png';
 
     /**
      * Checks given file and uploads it to the server

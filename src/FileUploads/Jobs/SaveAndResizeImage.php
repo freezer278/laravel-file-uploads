@@ -8,8 +8,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Facades\Image as FacadeImage;
 use Intervention\Image\File;
+use Intervention\Image\Image;
 use Vmorozov\FileUploads\FilesSaver;
 use Vmorozov\FileUploads\UploadedFilesCreator;
 
@@ -21,6 +22,7 @@ class SaveAndResizeImage implements ShouldQueue
     private $path;
     private $width;
     private $height;
+    private $uploadToRemote;
 
     public $tries = 1;
 
@@ -32,7 +34,7 @@ class SaveAndResizeImage implements ShouldQueue
      * @param int $width
      * @param int $height
      */
-    public function __construct(string $filePath, string $storage, int $width = 0, int $height = 0)
+    public function __construct(string $filePath, string $storage, int $width = 0, int $height = 0, bool $upload = true)
     {
         $this->width = $width;
         $this->height = $height;
@@ -40,6 +42,8 @@ class SaveAndResizeImage implements ShouldQueue
         $this->path = $filePath;
 
         $this->storage = $storage;
+
+        $this->uploadToRemote = $upload;
     }
 
     /**
@@ -53,15 +57,17 @@ class SaveAndResizeImage implements ShouldQueue
             $this->transformLocalImage($this->path);
         }
 
-        $file = UploadedFilesCreator::createUploadedFileFromPath($this->path);
+        if ($this->uploadToRemote) {
+            $file = UploadedFilesCreator::createUploadedFileFromPath($this->path);
 
-        FilesSaver::uploadFile($file, '', $this->storage, false, $this->path);
-        FilesSaver::deleteFile($this->path, FilesSaver::STORAGE_LOCAL);
+            FilesSaver::uploadFile($file, '', $this->storage, false, $this->path);
+            FilesSaver::deleteFile($this->path, FilesSaver::STORAGE_LOCAL);
+        }
     }
 
     private function transformLocalImage(string $path): Image
     {
-        $file = Image::make(public_path($path));
+        $file = FacadeImage::make(public_path($path));
 
         if ($this->width != 0 && $this->height != 0) {
             $file->fit($this->width, $this->height);

@@ -69,7 +69,11 @@ class Uploader
     {
         $file = UploadedFilesCreator::createUploadedFileFromBase64($value, $uploadsFolder);
 
-        return $uploadsFolder . '/' . $file->getBasename();
+        $path = $uploadsFolder . '/' . $file->getBasename();
+
+        dispatch(new SaveAndResizeImage($path, FilesSaver::STORAGE_LOCAL, 0, 0, false));
+
+        return $path;
     }
 
     public static function saveFileLocally(UploadedFile $file, string $uploadFolder = ''): string

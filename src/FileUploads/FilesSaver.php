@@ -37,7 +37,7 @@ class FilesSaver
         if (self::checkFileIsValid($file, $storage)) {
 
             if (!$fileNameGiven) {
-                $path = $uploadFolder . '/' . md5($file->getFilename().microtime()) . '.'.$file->extension();;
+                $path = $uploadFolder . '/' . md5($file->getFilename().microtime()) . '.'.$file->getClientOriginalExtension();
             }
             else
                 $path = $fileName;

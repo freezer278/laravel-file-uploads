@@ -12,6 +12,7 @@ use Intervention\Image\Facades\Image as FacadeImage;
 use Intervention\Image\File;
 use Intervention\Image\Image;
 use Vmorozov\FileUploads\FilesSaver;
+use Vmorozov\FileUploads\ImageCompressor;
 use Vmorozov\FileUploads\UploadedFilesCreator;
 
 class SaveAndResizeImage implements ShouldQueue
@@ -65,18 +66,8 @@ class SaveAndResizeImage implements ShouldQueue
         }
     }
 
-    private function transformLocalImage(string $path): Image
+    private function transformLocalImage(string $path)
     {
-        $file = FacadeImage::make(public_path($path));
-
-        if ($this->width != 0 && $this->height != 0) {
-            $file->fit($this->width, $this->height);
-        }
-
-        $file->encode(config('file_uploads.image_extension'), config('file_uploads.image_quality'));
-
-        $file->save(public_path($path), config('file_uploads.image_quality'));
-
-        return $file;
+        ImageCompressor::transformLocalImage($path, $this->width, $this->height);
     }
 }

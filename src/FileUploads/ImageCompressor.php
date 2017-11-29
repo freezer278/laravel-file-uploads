@@ -32,7 +32,7 @@ class ImageCompressor
             throw new Exception('File does not exist: $path');
         }
 
-        $compressed_png_content = shell_exec('pngquant --quality='.$quality.' - < '.escapeshellarg($path));
+        $compressed_png_content = shell_exec('pngquant --quality=5-'.$quality.' - < '.escapeshellarg($path));
 
         if (!$compressed_png_content) {
 //            throw new Exception('Conversion to compressed PNG failed. Is pngquant 1.8+ installed on the server?');

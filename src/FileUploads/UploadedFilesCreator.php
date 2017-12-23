@@ -15,16 +15,20 @@ class UploadedFilesCreator
      *
      * @param string $value
      * @param string $uploadFolder
+     * @param string $extension
      * @return UploadedFile
      */
-    public static function createUploadedFileFromBase64(string $value, string $uploadFolder = ''): UploadedFile
+    public static function createUploadedFileFromBase64(string $value, string $uploadFolder = '', string $extension = ''): UploadedFile
     {
         if ($uploadFolder == '')
             $uploadFolder = config('file_uploads.default_uploads_folder');
 
         $image = Image::make($value);
 
-        $filename = md5($image->basename.microtime()).'.'.config('file_uploads.image_extension');
+        if ($extension === '')
+            $extension = config('file_uploads.image_extension');
+
+        $filename = md5($image->basename.microtime()).'.'.$extension;
 
         $path = $uploadFolder.'/'.$filename;
 

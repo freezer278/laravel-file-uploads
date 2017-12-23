@@ -36,7 +36,7 @@ class Uploader
         if ($storage === '')
             $storage = config('file_uploads.files_upload_storage');
 
-        $localPath = static::saveBase64ImageLocally($value, $uploadFolder);
+        $localPath = static::saveBase64ImageLocally($value, $uploadFolder, $options['extension'] ?? '');
         $file = UploadedFilesCreator::createUploadedFileFromPath($localPath);
 
         if ($storage !== FilesSaver::STORAGE_LOCAL)
@@ -65,9 +65,9 @@ class Uploader
         return FilesSaver::uploadFile($file, '', $storage, true, $localPath);
     }
 
-    public static function saveBase64ImageLocally(string $value, string $uploadsFolder = ''): string
+    public static function saveBase64ImageLocally(string $value, string $uploadsFolder = '', string $extension = ''): string
     {
-        $file = UploadedFilesCreator::createUploadedFileFromBase64($value, $uploadsFolder);
+        $file = UploadedFilesCreator::createUploadedFileFromBase64($value, $uploadsFolder, $extension);
 
         $path = $uploadsFolder . '/' . $file->getBasename();
 
